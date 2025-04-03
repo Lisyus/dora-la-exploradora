@@ -1,35 +1,59 @@
 <!DOCTYPE html>
-    <html>
-    <head>
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.1.0/ol.css">
-      <script src="https://cdn.jsdelivr.net/npm/ol@v10.1.0/dist/ol.js"></script>
-      <script src="https://unpkg.com/ol-mapbox-style@12.1.1/dist/olms.js"></script>
-      <style>
-        #map {position: absolute; top: 0; right: 0; bottom: 0; left: 0;}
-      </style>
-    </head>
-    <body>
-      <div id="map">
-        <a href="https://www.maptiler.com" style="position:absolute;left:10px;bottom:10px;z-index:999;"><img src="https://api.maptiler.com/resources/logo.svg" alt="MapTiler logo"></a>
-      </div><p><a href="https://www.maptiler.com/copyright/" target="_blank">© MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">© OpenStreetMap contributors</a></p>
-    <script>
-      const key = '9kpZPozD9a56CdZtDn8Q';
-      const styleJson = `https://api.maptiler.com/maps/0195f90c-8167-7a73-bb0c-2c9778b0757c/style.json?key=${key}`;
-
-      const attribution = new ol.control.Attribution({
-        collapsible: false,
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MapTiler Globe projection</title>
+  <script src="https://cdn.maptiler.com/maptiler-sdk-js/v3.0.1/maptiler-sdk.umd.min.js"></script>
+  <link href="https://cdn.maptiler.com/maptiler-sdk-js/v3.0.1/maptiler-sdk.css" rel="stylesheet" />
+   <!-- Importing MapTiler 3D js -->
+<script src="https://cdn.maptiler.com/maptiler-3d/v2.0.2/maptiler-3d.umd.min.js"></script>
+  <style>
+    body { margin: 0; padding: 0; }
+    #map { position: absolute; top: 0; bottom: 0; width: 100%; background: 
+#000; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script>
+      maptilersdk.config.apiKey = 'YOUR_MAPTILER_API_KEY_HERE';
+      const map = new maptilersdk.Map({
+        container: 'map', // container's id or the HTML element to render the map
+        style:  'https://api.maptiler.com/maps/0195f90c-8167-7a73-bb0c-2c9778b0757c/style.json?key=9kpZPozD9a56CdZtDn8Q',
+        center: [-15.45, -21.27], // starting position [lng, lat]
+        zoom: 0.75, // starting zoom
+        projection: 'globe' //enable globe projection
       });
 
-      const map = new ol.Map({
-        target: 'map',
-        controls: ol.control.defaults.defaults({attribution: false}).extend([attribution]),
-        view: new ol.View({
-          constrainResolution: true,
-          center: ol.proj.fromLonLat([138.72770535219533, 35.36285862417158]),
-          zoom: 12
-        })
-      });
-      olms.apply(map, styleJson); 
-    </script>
-    </body>
-  </html>
+      (async () => {
+        await map.onReadyAsync();
+
+        const layer3D = new maptiler3d.Layer3D("custom-3D-layer");
+        map.addLayer(layer3D);
+
+        // Increasing the intensity of the ambient light
+        layer3D.setAmbientLight({intensity: 2});
+
+        // Adding a point light
+        layer3D.addPointLight("point-light", {intensity: 30});
+
+      
+
+        const originalDuckID = "duck";
+        await layer3D.addMeshFromURL(
+          originalDuckID,
+          "mapa.glb",
+          {
+            scale: 100000,
+            heading: 0,
+            lngLat: [138.72676235600622,35.36226816813547]
+          }
+        );
+
+      
+
+      })();
+  </script>
+</body>
+</html>
